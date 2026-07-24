@@ -79,4 +79,29 @@ class ExpCoreTest {
 
         assertThat(area.contains(15, 15)).isTrue();
     }
+
+    @Test
+    void computeAreaExcludeChildrenEmptyShape() {
+        PathObject parent = rectangle(0, 0, 0, 0, "Cellula");
+        PathObject child = rectangle(0, 0, 0, 0, "Nucleo");
+        parent.addChildObject(child);
+
+        Area area = ExpCore.computeArea(parent, true);
+
+        assertThat(area.getBounds()).isEqualTo(new Area().getBounds());
+        assertThat(area.isEmpty()).isTrue();
+    }
+
+    @Disabled
+    @Test
+    void computeAreaExcludeChildren() {
+        var parent = rectangle(0, 0, 40, 40, "Cellula");
+        var child = rectangle(10, 10, 10, 10, "Nucleo");
+        parent.addChildObject(child);
+
+        var area = ExpCore.computeArea(parent, true);
+
+        assertThat(area.contains(5, 5)).isTrue();
+        assertThat(area.contains(15, 15)).isFalse();
+    }
 }
