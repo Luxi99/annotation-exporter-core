@@ -29,7 +29,6 @@ class ExpCoreTest {
         assertThat(ExpCore.sortByHierarchy(List.of())).isEmpty();
     }
 
-    @Disabled
     @Test
     void testSortByHierarchy() {
         var parent = rectangle(0, 0, 50, 50, "Nome");
