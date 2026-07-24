@@ -69,7 +69,6 @@ class ExpCoreTest {
         assertThat(area.isEmpty()).isTrue();
     }
 
-    @Disabled
     @Test
     void computeAreaIncludeChildren() {
         PathObject parent = rectangle(0, 0, 40, 40, "Cellula");
