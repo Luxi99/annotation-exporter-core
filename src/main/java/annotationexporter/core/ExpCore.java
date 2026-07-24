@@ -3,6 +3,7 @@ package annotationexporter.core;
 import org.jetbrains.annotations.NotNull;
 import qupath.lib.objects.PathObject;
 
+import java.awt.geom.Area;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -34,5 +35,9 @@ public class ExpCore {
         List<PathObject> modifiableList = new ArrayList<>(annotations);
         modifiableList.sort(Comparator.comparingInt(PathObject::getLevel));
         return modifiableList;
+    }
+
+    public static @NotNull Area computeArea(@NotNull PathObject annotation, boolean excludeChildrenArea) {
+        return new Area();
     }
 }

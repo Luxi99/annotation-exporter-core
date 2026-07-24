@@ -10,6 +10,7 @@ import qupath.lib.regions.ImagePlane;
 import qupath.lib.roi.ROIs;
 import qupath.lib.roi.interfaces.ROI;
 
+import java.awt.geom.Area;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,5 +55,29 @@ class ExpCoreTest {
         List<PathObject> sorted = ExpCore.sortByHierarchy(List.of(parent, child1, grandparent, child2));
 
         assertThat(sorted).containsExactly(grandparent, parent, child1, child2);
+    }
+
+    @Test
+    void computeAreaIncludeChildrenEmptyShape() {
+        PathObject parent = rectangle(0, 0, 0, 0, "Cellula");
+        PathObject child = rectangle(0, 0, 0, 0, "Nucleo");
+        parent.addChildObject(child);
+
+        Area area = ExpCore.computeArea(parent, false);
+
+        assertThat(area.getBounds()).isEqualTo(new Area().getBounds());
+        assertThat(area.isEmpty()).isTrue();
+    }
+
+    @Disabled
+    @Test
+    void computeAreaIncludeChildren() {
+        PathObject parent = rectangle(0, 0, 40, 40, "Cellula");
+        PathObject child = rectangle(10, 10, 10, 10, "Nucleo");
+        parent.addChildObject(child);
+
+        Area area = ExpCore.computeArea(parent, false);
+
+        assertThat(area.contains(15, 15)).isTrue();
     }
 }
