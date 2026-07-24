@@ -39,4 +39,20 @@ class ExpCoreTest {
         List<PathObject> sorted = ExpCore.sortByHierarchy(List.of(child, parent));
         assertThat(sorted).containsExactly(parent, child);
     }
+
+    @Test
+    void testSortByHierarchyMultipleNested() {
+        PathObject grandparent = rectangle(0, 0, 100, 100, "A");
+        PathObject parent = rectangle(10, 10, 50, 50, "B");
+        PathObject child1 = rectangle(20, 20, 10, 10, "C");
+        PathObject child2 = rectangle(30, 20, 5, 5, "D");
+
+        grandparent.addChildObject(parent);
+        parent.addChildObject(child1);
+        parent.addChildObject(child2);
+
+        List<PathObject> sorted = ExpCore.sortByHierarchy(List.of(parent, child1, grandparent, child2));
+
+        assertThat(sorted).containsExactly(grandparent, parent, child1, child2);
+    }
 }
