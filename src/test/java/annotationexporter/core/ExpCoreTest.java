@@ -103,4 +103,20 @@ class ExpCoreTest {
         assertThat(area.contains(5, 5)).isTrue();
         assertThat(area.contains(15, 15)).isFalse();
     }
+
+    @Test
+    void computeAreaExcludeMoreChildren() {
+        var parent = rectangle(0, 0, 40, 40, "Cellula");
+        var child1 = rectangle(10, 10, 10, 10, "N1");
+        var child2 = rectangle(20, 10, 5, 5, "N2");
+        parent.addChildObject(child1);
+        parent.addChildObject(child2);
+
+        var area = ExpCore.computeArea(parent, true);
+
+        assertThat(area.contains(5, 5)).isTrue();
+        assertThat(area.contains(25, 16)).isTrue();
+        assertThat(area.contains(15, 15)).isFalse();
+        assertThat(area.contains(23, 13)).isFalse();
+    }
 }
