@@ -3,6 +3,7 @@ package annotationexporter.core;
 import org.jetbrains.annotations.NotNull;
 import qupath.lib.objects.PathObject;
 
+import java.awt.*;
 import java.awt.geom.Area;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -38,6 +39,8 @@ public class ExpCore {
     }
 
     public static @NotNull Area computeArea(@NotNull PathObject annotation, boolean excludeChildrenArea) {
-        return new Area();
+        Shape shape = annotation.getROI().getShape();
+
+        return new Area(shape);
     }
 }
