@@ -93,7 +93,7 @@ class ExpCoreTest {
     }
 
     @Test
-    void computeAreaExcludeChildren() {
+    void computeAreaExcludeChild() {
         var parent = rectangle(0, 0, 40, 40, "Cellula");
         var child = rectangle(10, 10, 10, 10, "Nucleo");
         parent.addChildObject(child);

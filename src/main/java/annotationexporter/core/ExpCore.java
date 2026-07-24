@@ -2,6 +2,7 @@ package annotationexporter.core;
 
 import org.jetbrains.annotations.NotNull;
 import qupath.lib.objects.PathObject;
+import qupath.lib.roi.interfaces.ROI;
 
 import java.awt.*;
 import java.awt.geom.Area;
@@ -40,7 +41,17 @@ public class ExpCore {
 
     public static @NotNull Area computeArea(@NotNull PathObject annotation, boolean excludeChildrenArea) {
         Shape shape = annotation.getROI().getShape();
+        Area area = new Area(shape);
 
-        return new Area(shape);
+        if (excludeChildrenArea) {
+            for (PathObject child : annotation.getChildObjects()) {
+                ROI childRoi = child.getROI();
+                if (childRoi != null && childRoi.getShape() != null) {
+                    area.subtract(new Area(childRoi.getShape()));
+                }
+            }
+        }
+
+        return area;
     }
 }
