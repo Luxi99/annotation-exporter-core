@@ -92,7 +92,6 @@ class ExpCoreTest {
         assertThat(area.isEmpty()).isTrue();
     }
 
-    @Disabled
     @Test
     void computeAreaExcludeChildren() {
         var parent = rectangle(0, 0, 40, 40, "Cellula");
