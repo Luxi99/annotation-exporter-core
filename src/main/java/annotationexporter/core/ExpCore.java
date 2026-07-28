@@ -67,6 +67,6 @@ public class ExpCore {
     }
 
     public static @NotNull List<PathObject> filter(@NotNull List<PathObject> annotations, @NotNull Predicate<PathObject> filter) {
-        return List.of();
+        return annotations.stream().filter(filter).toList();
     }
 }

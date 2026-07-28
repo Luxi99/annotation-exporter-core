@@ -128,7 +128,7 @@ class ExpCoreTest {
         PathObject c = rectangle(0, 0, 0, 0, "Tumore");
 
         List<PathObject> result = ExpCore.filter(
-                List.of(a, b),
+                List.of(a, b, c),
                 p -> p.getROI().getArea() > 0 && "Tumore".equals(p.getPathClass().getName())
         );
 
