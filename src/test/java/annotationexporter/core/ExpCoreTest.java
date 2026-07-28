@@ -12,6 +12,7 @@ import qupath.lib.roi.interfaces.ROI;
 
 import java.awt.geom.Area;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -133,5 +134,16 @@ class ExpCoreTest {
         );
 
         assertThat(result).containsExactlyInAnyOrder(a);
+    }
+
+    @Test
+    void testClassNamePredicateExcludeMode() {
+        Predicate<PathObject> predicate = ExpCore.getClassnamesPredicate(
+                FilterMode.EXCLUDE, List.of("artefatto")
+        );
+        PathObject artefatto = rectangle(0, 0, 10, 10, "Artefatto");
+
+        assertThat(predicate.test(artefatto)).isFalse();
+
     }
 }
