@@ -142,8 +142,34 @@ class ExpCoreTest {
                 FilterMode.EXCLUDE, List.of("artefatto")
         );
         PathObject artefatto = rectangle(0, 0, 10, 10, "Artefatto");
+        PathObject manufatto = rectangle(0, 0, 10, 10, "Manufatto");
 
         assertThat(predicate.test(artefatto)).isFalse();
+        assertThat(predicate.test(manufatto)).isTrue();
+    }
+
+    @Test
+    void testClassNamePredicateIncludeMode() {
+        Predicate<PathObject> predicate = ExpCore.getClassnamesPredicate(
+                FilterMode.INCLUDE, List.of("artefatto")
+        );
+        PathObject artefatto = rectangle(0, 0, 10, 10, "Artefatto");
+        PathObject manufatto = rectangle(0, 0, 10, 10, "Manufatto");
+
+        assertThat(predicate.test(artefatto)).isTrue();
+        assertThat(predicate.test(manufatto)).isFalse();
+    }
+
+    @Test
+    void testClassNamePredicateNoneMode() {
+        Predicate<PathObject> predicate = ExpCore.getClassnamesPredicate(
+                FilterMode.NONE, List.of("artefatto")
+        );
+        PathObject artefatto = rectangle(0, 0, 10, 10, "Artefatto");
+        PathObject manufatto = rectangle(0, 0, 10, 10, "Manufatto");
+
+        assertThat(predicate.test(artefatto)).isTrue();
+        assertThat(predicate.test(manufatto)).isTrue();
 
     }
 }
