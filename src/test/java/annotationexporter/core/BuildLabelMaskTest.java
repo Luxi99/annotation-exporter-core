@@ -8,6 +8,7 @@ import qupath.lib.regions.ImagePlane;
 import qupath.lib.roi.ROIs;
 import qupath.lib.roi.interfaces.ROI;
 
+import java.awt.image.WritableRaster;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,11 +49,11 @@ public class BuildLabelMaskTest {
 
     @Test
     void labelsAreSequentialStartingFromOne() {
-        var a = rectangle(5, 5, 20, 20, "red blood cell");
-        var b = rectangle(40, 40, 20, 20, "lymphocyte");
+        PathObject a = rectangle(5, 5, 20, 20, "red blood cell");
+        PathObject b = rectangle(40, 40, 20, 20, "lymphocyte");
 
-        var result = AnnotationExporter.buildLabelMask(List.of(a, b), W, H, true);
-        var raster = result.image().getRaster();
+        AnnotationExporter.LabelResult result = AnnotationExporter.buildLabelMask(List.of(a, b), W, H, true);
+        WritableRaster raster = result.image().getRaster();
 
         assertThat(raster.getSample(15, 15, 0)).isEqualTo(1);
         assertThat(raster.getSample(50, 50, 0)).isEqualTo(2);
@@ -61,13 +62,25 @@ public class BuildLabelMaskTest {
 
     @Test
     void testDifferentiateChildrenFromParent() {
-        var child = rectangle(25, 25, 10, 10, "nucleo");
-        var parent = rectangle(10, 10, 50, 50, "cellula cancerosa");
+        PathObject child = rectangle(25, 25, 10, 10, "nucleo");
+        PathObject parent = rectangle(10, 10, 50, 50, "cellula cancerosa");
         parent.addChildObject(child);
 
-        var result = AnnotationExporter.buildLabelMask(List.of(parent, child), W, H, true);
+        AnnotationExporter.LabelResult result = AnnotationExporter.buildLabelMask(List.of(parent, child), W, H, true);
 
         assertThat(result.tableRows()).hasSize(2);
         assertThat(result.image().getRaster().getSample(30, 30, 0)).isNotEqualTo(1);
+    }
+
+    @Test
+    void testDifferentiateChildrenFromParentNoMore() {
+        PathObject child = rectangle(25, 25, 10, 10, "nucleo");
+        PathObject parent = rectangle(10, 10, 50, 50, "cellula cancerosa");
+        parent.addChildObject(child);
+
+        AnnotationExporter.LabelResult result = AnnotationExporter.buildLabelMask(List.of(parent, child), W, H, false);
+
+        assertThat(result.tableRows()).hasSize(1);
+        assertThat(result.image().getRaster().getSample(30, 30, 0)).isEqualTo(1);
     }
 }
