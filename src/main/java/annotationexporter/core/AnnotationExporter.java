@@ -7,10 +7,14 @@ import qupath.lib.objects.PathObject;
 import qupath.lib.objects.hierarchy.PathObjectHierarchy;
 import qupath.lib.roi.interfaces.ROI;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -124,6 +128,7 @@ public class AnnotationExporter {
      *
      * @apiNote This method works only for already defined hierarchies, if no parent-child relationship is
      * set, there is no guarantee that inner objects will be visible in the final mask. See {@link PathObjectHierarchy#resolveHierarchy()}
+     * and {@link PathObject#getChildObjects()}
      *
      * @param annotations the {@code List<PathObject>} annotations to build the label mask from.
      *                    Must be already sorted or filtered if necessary.
@@ -208,6 +213,35 @@ public class AnnotationExporter {
                 }
             }
         }
+    }
+
+    /**
+     * Saves the given table rows to the path as a TSV file with the given header.
+     *
+     * @param rows the {@code List<String>} of rows to save
+     * @param header the {@code String} header of the table
+     * @param path the {@code Path} to save the table to
+     * @throws IOException if an I/O error occurs
+     */
+    public static void writeTable(List<String> rows, String header, Path path) throws IOException {
+        Files.createDirectories(path.getParent());
+        List<String> lines = new ArrayList<>();
+        lines.add(header);
+        lines.addAll(rows);
+        Files.write(path, lines);
+    }
+
+    /**
+     * Saves the given image to the path with the given format name.
+     *
+     * @param image the {@code BufferedImage} to save
+     * @param formatName the {@code String} format name of the image
+     * @param path the {@code Path} to save the image to
+     * @throws IOException if an I/O error occurs
+     */
+    public static void writeImage(BufferedImage image, String formatName, Path path) throws IOException {
+        Files.createDirectories(path.getParent());
+        ImageIO.write(image, formatName, path.toFile());
     }
 
     /**
