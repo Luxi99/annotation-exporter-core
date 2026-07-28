@@ -37,9 +37,9 @@ public class ExpCore {
      * @return the sorted list of annotations
      */
     public static @NotNull List<PathObject> sortByHierarchy(@NotNull List<PathObject> annotations) {
-        List<PathObject> modifiableList = new ArrayList<>(annotations);
-        modifiableList.sort(Comparator.comparingInt(PathObject::getLevel));
-        return modifiableList;
+        List<PathObject> safeList = new ArrayList<>(annotations);
+        safeList.sort(Comparator.comparingInt(PathObject::getLevel));
+        return safeList;
     }
 
     /**
@@ -76,7 +76,8 @@ public class ExpCore {
      * @return the filtered {@code List<PathObject>}
      */
     public static @NotNull List<PathObject> filter(@NotNull List<PathObject> annotations, @NotNull Predicate<PathObject> filter) {
-        return annotations.stream().filter(filter).toList();
+        List<PathObject> safeList = new ArrayList<>(annotations);
+        return safeList.stream().filter(filter).toList();
     }
 
     /**
