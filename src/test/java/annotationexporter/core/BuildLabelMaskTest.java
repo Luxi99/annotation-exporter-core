@@ -83,4 +83,40 @@ public class BuildLabelMaskTest {
         assertThat(result.tableRows()).hasSize(1);
         assertThat(result.image().getRaster().getSample(30, 30, 0)).isEqualTo(1);
     }
+
+    @Test
+    void testDeeplyNestedAnnotationsTSV() {
+        PathObject grandchild = rectangle(30, 30, 5, 5, "livello3");
+        PathObject child = rectangle(20, 20, 20, 20, "livello2");
+        PathObject parent = rectangle(10, 10, 50, 50, "livello1");
+        child.addChildObject(grandchild);
+        parent.addChildObject(child);
+
+        var result = AnnotationExporter.buildLabelMask(
+                List.of(grandchild, parent, child), W, H, true
+        );
+
+        assertThat(result.tableRows()).hasSize(3);
+        assertThat(result.tableRows().get(0)).contains("livello1");
+        assertThat(result.tableRows().get(1)).contains("livello2");
+        assertThat(result.tableRows().get(2)).contains("livello3");
+    }
+
+    @Test
+    void testDeeplyNestedAnnotationsLabels() {
+        PathObject grandchild = rectangle(30, 30, 5, 5, "livello3");
+        PathObject child = rectangle(20, 20, 20, 20, "livello2");
+        PathObject parent = rectangle(10, 10, 50, 50, "livello1");
+        child.addChildObject(grandchild);
+        parent.addChildObject(child);
+
+        var result = AnnotationExporter.buildLabelMask(
+                List.of(grandchild, parent, child), W, H, true
+        );
+
+        assertThat(result.image().getRaster().getSample(0, 0, 0)).isEqualTo(0);
+        assertThat(result.image().getRaster().getSample(10, 10, 0)).isEqualTo(1);
+        assertThat(result.image().getRaster().getSample(20, 20, 0)).isEqualTo(2);
+        assertThat(result.image().getRaster().getSample(30, 30, 0)).isEqualTo(3);
+    }
 }
