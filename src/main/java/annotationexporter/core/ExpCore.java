@@ -115,6 +115,21 @@ public class ExpCore {
 
     }
 
+    /**
+     * Builds a label mask image and TSV formatted rows from the given annotations.
+     * The label mask image is a 16-bit grayscale image
+     * with each pixel value (or label) representing a different annotation.
+     * The TSV formatted rows are the annotations' data in a tab-separated format:
+     * Label Centroid_X Centroid_Y ClassName
+     *
+     * @param annotations the {@code List<PathObject>} annotations to build the label mask from.
+     *                    Must be already sorted or filtered if necessary.
+     * @param IMG_W the width of the starting image in pixels.
+     * @param IMG_H the height of the starting image in pixels
+     * @param differentiateChildren if {@code true} the children of each annotation will be treated as a separate label,
+     *                              otherwise they will be ignored
+     * @return the {@code LabelResult} containing the label mask image and the TSV formatted rows.
+     */
     public static @NotNull LabelResult buildLabelMask(@NotNull List<PathObject> annotations, int IMG_W, int IMG_H, boolean differentiateChildren) {
         BufferedImage labelImage = new BufferedImage(IMG_W, IMG_H, BufferedImage.TYPE_USHORT_GRAY);
         WritableRaster raster = labelImage.getRaster();
@@ -143,32 +158,53 @@ public class ExpCore {
 
             Area area = computeArea(annotation, differentiateChildren);
 
-            //paint label
-            BufferedImage temp = new BufferedImage(IMG_W, IMG_H, BufferedImage.TYPE_BYTE_BINARY);
-            Graphics2D g = temp.createGraphics();
-            g.setColor(Color.WHITE);
-            g.fill(area);
-            g.dispose();
-
-            WritableRaster binaryRaster = temp.getRaster();
-            for (int y = 0; y < IMG_H; y++) {
-                for (int x = 0; x < IMG_W; x++) {
-                    if (binaryRaster.getSample(x, y, 0) > 0) {
-                        raster.setSample(x, y, 0, label);
-                    }
-                }
-            }
-
-            String className = annotation.getPathClass() != null
-                    ? annotation.getPathClass().getName()
-                    : "Unclassified";
-            String row = label + "\t" + roi.getCentroidX() + "\t" + roi.getCentroidY() + "\t" + className;
-
-            tableRows.add(row);
+            paintLabel(raster, area, IMG_W, IMG_H, label);
+            tableRows.add(toTsvRow(annotation, label));
             label++;
         }
 
         return new LabelResult(labelImage, tableRows);
+    }
+
+    /**
+     * Returns a string representation of the given annotation in TSV format. With the following format:
+     * Label Centroid_X Centroid_Y ClassName
+     *
+     * @param annotation the {@code PathObject} annotation to convert to a TSV row
+     * @param label the label of the annotation represented as an {@code int}
+     * @return the {@code String} as a TSV formatted row with the given annotation's data
+     */
+    private static String toTsvRow(@NotNull PathObject annotation, int label) {
+        var roi = annotation.getROI();
+        String className = annotation.getPathClass() != null
+                ? annotation.getPathClass().getName()
+                : "Unclassified";
+        return label + "\t" + roi.getCentroidX() + "\t" + roi.getCentroidY() + "\t" + className;
+    }
+
+    /**
+     * Paints the given area with the given label in the given raster.
+     * @param raster the {@code WritableRaster} to paint the area in
+     * @param area the {@code Area} to paint
+     * @param IMG_W the width of the final image
+     * @param IMG_H the height of the final image
+     * @param label the label to paint the area with
+     */
+    private static void paintLabel(@NotNull WritableRaster raster, @NotNull Area area, int IMG_W, int IMG_H, int label) {
+        BufferedImage temp = new BufferedImage(IMG_W, IMG_H, BufferedImage.TYPE_BYTE_BINARY);
+        Graphics2D g = temp.createGraphics();
+        g.setColor(Color.WHITE);
+        g.fill(area);
+        g.dispose();
+
+        WritableRaster binaryRaster = temp.getRaster();
+        for (int y = 0; y < IMG_H; y++) {
+            for (int x = 0; x < IMG_W; x++) {
+                if (binaryRaster.getSample(x, y, 0) > 0) {
+                    raster.setSample(x, y, 0, label);
+                }
+            }
+        }
     }
 
     /**
