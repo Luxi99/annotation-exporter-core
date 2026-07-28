@@ -119,4 +119,14 @@ public class BuildLabelMaskTest {
         assertThat(result.image().getRaster().getSample(20, 20, 0)).isEqualTo(2);
         assertThat(result.image().getRaster().getSample(30, 30, 0)).isEqualTo(3);
     }
+
+    @Test
+    void testUnclassifiedAnnotation() {
+        var noClass = rectangle(0, 0, 20, 20, null);
+
+        var result = AnnotationExporter.buildLabelMask(List.of(noClass), W, H, true);
+
+        assertThat(result.tableRows()).hasSize(1);
+        assertThat(result.tableRows().getFirst()).endsWith("Unclassified");
+    }
 }
