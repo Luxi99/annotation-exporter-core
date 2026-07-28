@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "io.github.Luxi99"
-version = "0.1.0"
+version = "0.1.1"
 
 java {
     withSourcesJar()
@@ -66,8 +66,8 @@ publishing {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/Luxi99/annotation-exporter-core")
             credentials {
-                username = System.getenv("GITHUB_ACTOR") ?: project.findProperty("gpr.user") as String?
-                password = System.getenv("GITHUB_TOKEN") ?: project.findProperty("gpr.token") as String?
+                username = (project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR"))?.toString()
+                password = (project.findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN"))?.toString()
             }
         }
     }
