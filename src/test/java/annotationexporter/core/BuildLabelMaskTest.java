@@ -59,4 +59,15 @@ public class BuildLabelMaskTest {
         assertThat(raster.getSample(0, 0, 0)).isEqualTo(0);
     }
 
+    @Test
+    void testDifferentiateChildrenFromParent() {
+        var child = rectangle(25, 25, 10, 10, "nucleo");
+        var parent = rectangle(10, 10, 50, 50, "cellula cancerosa");
+        parent.addChildObject(child);
+
+        var result = AnnotationExporter.buildLabelMask(List.of(parent, child), W, H, true);
+
+        assertThat(result.tableRows()).hasSize(2);
+        assertThat(result.image().getRaster().getSample(30, 30, 0)).isNotEqualTo(1);
+    }
 }
