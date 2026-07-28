@@ -1,12 +1,15 @@
 package annotationexporter.core;
 
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import qupath.lib.objects.PathObject;
 import qupath.lib.roi.interfaces.ROI;
 
 import java.awt.*;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
+import java.awt.image.WritableRaster;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -18,6 +21,9 @@ import java.util.stream.Collectors;
  * Utility class for exporting annotations from QuPath
  */
 public class ExpCore {
+    private static final Logger logger = LoggerFactory.getLogger(ExpCore.class);
+    private static final int MAX_LABEL = 65535;
+
     /**
      * Sorts the list of annotations by each annotation's hierarchy level, with annotations
      * deeper in the hierarchy coming last.
@@ -110,12 +116,63 @@ public class ExpCore {
     }
 
     public static @NotNull LabelResult buildLabelMask(@NotNull List<PathObject> annotations, int IMG_W, int IMG_H, boolean differentiateChildren) {
-        return null;
+        BufferedImage labelImage = new BufferedImage(IMG_W, IMG_H, BufferedImage.TYPE_USHORT_GRAY);
+        WritableRaster raster = labelImage.getRaster();
+        List<String> tableRows = new ArrayList<>();
+        int label = 1;
+
+        List<PathObject> ordered = sortByHierarchy(annotations);
+
+        if (!differentiateChildren) {
+            ordered = ordered.stream()
+                    .filter(a -> a.getParent() == null || a.getParent().isRootObject())
+                    .toList();
+        }
+
+        for (PathObject annotation : ordered) {
+            if (label > MAX_LABEL) {
+                logger.warn("Exceeded max number of annotations (%d, 16 bit image).\nStopping...".formatted(MAX_LABEL));
+                break;
+            }
+
+            var roi = annotation.getROI();
+            if (roi == null || roi.getShape() == null) {
+                logger.warn("Undefined ROI.\nskipping...");
+                continue;
+            }
+
+            Area area = computeArea(annotation, differentiateChildren);
+
+            //paint label
+            BufferedImage temp = new BufferedImage(IMG_W, IMG_H, BufferedImage.TYPE_BYTE_BINARY);
+            Graphics2D g = temp.createGraphics();
+            g.setColor(Color.WHITE);
+            g.fill(area);
+            g.dispose();
+
+            WritableRaster binaryRaster = temp.getRaster();
+            for (int y = 0; y < IMG_H; y++) {
+                for (int x = 0; x < IMG_W; x++) {
+                    if (binaryRaster.getSample(x, y, 0) > 0) {
+                        raster.setSample(x, y, 0, label);
+                    }
+                }
+            }
+
+            String className = annotation.getPathClass() != null
+                    ? annotation.getPathClass().getName()
+                    : "Unclassified";
+            String row = label + "\t" + roi.getCentroidX() + "\t" + roi.getCentroidY() + "\t" + className;
+
+            tableRows.add(row);
+            label++;
+        }
+
+        return new LabelResult(labelImage, tableRows);
     }
 
     /**
      * Result of extracting and labeling operations.
      */
-    public record LabelResult(@NotNull BufferedImage image, @NotNull List<String> tableRows) {
-    }
+    public record LabelResult(@NotNull BufferedImage image, @NotNull List<String> tableRows) {}
 }
