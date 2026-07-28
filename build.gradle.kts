@@ -25,6 +25,7 @@ dependencies {
     api("io.github.qupath:qupath-core:0.7.0")
 
     implementation("org.jetbrains:annotations:26.0.2")
+    implementation("org.slf4j:slf4j-api:2.0.17")
 
     testImplementation(platform("org.junit:junit-bom:6.0.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
