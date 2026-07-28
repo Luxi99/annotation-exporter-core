@@ -1,7 +1,6 @@
 package annotationexporter.core;
 
 import org.junit.jupiter.api.Test;
-import qupath.lib.objects.PathAnnotationObject;
 import qupath.lib.objects.PathObject;
 import qupath.lib.objects.PathObjects;
 import qupath.lib.objects.classes.PathClass;
@@ -31,7 +30,7 @@ public class BuildLabelMaskTest {
         PathObject child = rectangle(10, 10, 10, 10, "Nucleo");
         parent.addChildObject(child);
 
-        ExpCore.LabelResult result = ExpCore.buildLabelMask(
+        AnnotationExporter.LabelResult result = AnnotationExporter.buildLabelMask(
                 List.of(child, parent), 50, 50, true
         );
 
@@ -41,9 +40,23 @@ public class BuildLabelMaskTest {
 
     @Test
     void testEmptyListReturnsEmptyImageAndTable() {
-        ExpCore.LabelResult result = ExpCore.buildLabelMask(List.of(), W, H, true);
+        AnnotationExporter.LabelResult result = AnnotationExporter.buildLabelMask(List.of(), W, H, true);
 
         assertThat(result.tableRows()).isEmpty();
         assertThat(result.image().getRaster().getSample(50, 50, 0)).isEqualTo(0);
     }
+
+    @Test
+    void labelsAreSequentialStartingFromOne() {
+        var a = rectangle(5, 5, 20, 20, "red blood cell");
+        var b = rectangle(40, 40, 20, 20, "lymphocyte");
+
+        var result = AnnotationExporter.buildLabelMask(List.of(a, b), W, H, true);
+        var raster = result.image().getRaster();
+
+        assertThat(raster.getSample(15, 15, 0)).isEqualTo(1);
+        assertThat(raster.getSample(50, 50, 0)).isEqualTo(2);
+        assertThat(raster.getSample(0, 0, 0)).isEqualTo(0);
+    }
+
 }
