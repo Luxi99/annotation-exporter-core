@@ -1,0 +1,49 @@
+package annotationexporter.core;
+
+import org.junit.jupiter.api.Test;
+import qupath.lib.objects.PathAnnotationObject;
+import qupath.lib.objects.PathObject;
+import qupath.lib.objects.PathObjects;
+import qupath.lib.objects.classes.PathClass;
+import qupath.lib.regions.ImagePlane;
+import qupath.lib.roi.ROIs;
+import qupath.lib.roi.interfaces.ROI;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+public class BuildLabelMaskTest {
+    private static final int W = 100;
+    private static final int H = 100;
+
+    private static PathObject rectangle(double x, double y, double w, double h, String className) {
+        ROI roi = ROIs.createRectangleROI(x, y, w, h, ImagePlane.getDefaultPlane());
+        return PathObjects.createAnnotationObject(
+                roi,
+                className == null ? null : PathClass.fromString(className)
+        );
+    }
+
+    @Test
+    void testBuildLabelMaskCorrectDimensions() {
+        PathObject parent = rectangle(0, 0, 40, 40, "Cellula");
+        PathObject child = rectangle(10, 10, 10, 10, "Nucleo");
+        parent.addChildObject(child);
+
+        ExpCore.LabelResult result = ExpCore.buildLabelMask(
+                List.of(child, parent), 50, 50, true
+        );
+
+        assertThat(result.tableRows()).hasSize(2);
+        assertThat(result.image().getWidth()).isEqualTo(50);
+    }
+
+    @Test
+    void testEmptyListReturnsEmptyImageAndTable() {
+        ExpCore.LabelResult result = ExpCore.buildLabelMask(List.of(), W, H, true);
+
+        assertThat(result.tableRows()).isEmpty();
+        assertThat(result.image().getRaster().getSample(50, 50, 0)).isEqualTo(0);
+    }
+}
