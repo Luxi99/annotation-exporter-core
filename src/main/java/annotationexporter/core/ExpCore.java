@@ -67,10 +67,27 @@ public class ExpCore {
         return area;
     }
 
+    /**
+     * Filters the given list of annotations keeping only the elements that match the predicate.
+     *
+     * @param annotations the {@code List<PathObject>} list of annotations to filter elemets from
+     * @param filter the {@code Predicate<PathObject>} to filter elements with
+     * @return the filtered {@code List<PathObject>}
+     */
     public static @NotNull List<PathObject> filter(@NotNull List<PathObject> annotations, @NotNull Predicate<PathObject> filter) {
         return annotations.stream().filter(filter).toList();
     }
 
+    /**
+     * Returns a predicate that filters annotations based on the given class names and filter mode.
+     *
+     * @param mode the {@code FilterMode} to use for filtering
+     *             {@link FilterMode#NONE} for no filtering,
+     *             {@link FilterMode#EXCLUDE} for excluding the given class names,
+     *             {@link FilterMode#INCLUDE} for including only the given class names
+     * @param classNames the {@code List<String>} of class names to filter by
+     * @return the {@code Predicate<PathObject>} matching the given filter mode and class names
+     */
     public static @NotNull Predicate<PathObject> getClassnamesPredicate(@NotNull FilterMode mode, @NotNull List<String> classNames) {
         List<String> safeClassnames = new ArrayList<>(classNames);
         List<String> lowered = safeClassnames.stream().map(String::toLowerCase).toList();
