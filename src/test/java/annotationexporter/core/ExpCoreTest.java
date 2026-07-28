@@ -172,4 +172,18 @@ class ExpCoreTest {
         assertThat(predicate.test(manufatto)).isTrue();
 
     }
+
+    @Test
+    void testBuildLabelMaskCorrectDimensions() {
+        PathObject parent = rectangle(0, 0, 40, 40, "Cellula");
+        PathObject child = rectangle(10, 10, 10, 10, "Nucleo");
+        parent.addChildObject(child);
+
+        ExpCore.LabelResult result = ExpCore.buildLabelMask(
+                List.of(child, parent), 50, 50, true
+        );
+
+        assertThat(result.tableRows()).hasSize(2);
+        assertThat(result.image().getWidth()).isEqualTo(50);
+    }
 }

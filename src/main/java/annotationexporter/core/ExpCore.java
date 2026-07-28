@@ -6,6 +6,7 @@ import qupath.lib.roi.interfaces.ROI;
 
 import java.awt.*;
 import java.awt.geom.Area;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -106,5 +107,15 @@ public class ExpCore {
             );
         };
 
+    }
+
+    public static @NotNull LabelResult buildLabelMask(@NotNull List<PathObject> annotations, int IMG_W, int IMG_H, boolean differentiateChildren) {
+        return null;
+    }
+
+    /**
+     * Result of extracting and labeling operations.
+     */
+    public record LabelResult(@NotNull BufferedImage image, @NotNull List<String> tableRows) {
     }
 }
