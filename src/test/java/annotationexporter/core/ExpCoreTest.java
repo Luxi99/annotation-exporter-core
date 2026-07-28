@@ -12,6 +12,7 @@ import qupath.lib.roi.interfaces.ROI;
 
 import java.awt.geom.Area;
 import java.util.List;
+import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -118,5 +119,19 @@ class ExpCoreTest {
         assertThat(area.contains(25, 16)).isTrue();
         assertThat(area.contains(15, 15)).isFalse();
         assertThat(area.contains(23, 13)).isFalse();
+    }
+
+    @Test
+    void filterWithArbitraryPredicateKeepsMatchingOnly() {
+        PathObject a = rectangle(0, 0, 10, 10, "Tumore");
+        PathObject b = rectangle(0, 0, 10, 10, "Stroma");
+        PathObject c = rectangle(0, 0, 0, 0, "Tumore");
+
+        List<PathObject> result = ExpCore.filter(
+                List.of(a, b),
+                p -> p.getROI().getArea() > 0 && "Tumore".equals(p.getPathClass().getName())
+        );
+
+        assertThat(result).containsExactlyInAnyOrder(a);
     }
 }

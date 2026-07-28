@@ -9,6 +9,7 @@ import java.awt.geom.Area;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Utility class for exporting annotations from QuPath
@@ -63,5 +64,9 @@ public class ExpCore {
         }
 
         return area;
+    }
+
+    public static @NotNull List<PathObject> filter(@NotNull List<PathObject> annotations, @NotNull Predicate<PathObject> filter) {
+        return List.of();
     }
 }
