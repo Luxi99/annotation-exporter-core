@@ -77,9 +77,13 @@ public class ExpCore {
 
         return switch (mode) {
             case NONE -> p -> true;
-            case EXCLUDE -> p -> !lowered.contains(p.getPathClass() != null ? p.getPathClass().getName().toLowerCase() : "");
-            case INCLUDE -> p -> lowered.contains(p.getPathClass() != null ? p.getPathClass().getName().toLowerCase() : "");
+            case EXCLUDE -> p -> !lowered.contains(getClassName(p));
+            case INCLUDE -> p -> lowered.contains(getClassName(p));
         };
 
+    }
+
+    private static @NotNull String getClassName(PathObject p) {
+        return p.getPathClass() != null ? p.getPathClass().getName().toLowerCase() : "";
     }
 }
