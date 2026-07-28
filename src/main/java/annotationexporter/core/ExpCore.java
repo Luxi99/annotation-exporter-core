@@ -39,6 +39,16 @@ public class ExpCore {
         return modifiableList;
     }
 
+    /**
+     * Calculates the area of the given annotation, optionally excluding the area of its children (such as nuclei).
+     *
+     * @param annotation the {@code PathObject} annotation to compute the area for
+     * @param excludeChildrenArea if {@code true} the area of the children will be subtracted from the annotation's area (donut shape),
+     *                            otherwise the area of the chilren will be filled in the parent object
+     * @return the computed {@code Area} object for the annotation
+     *
+     * @apiNote if the annotation's children have children themselves, they will be ignored and only the main area will be considered
+     */
     public static @NotNull Area computeArea(@NotNull PathObject annotation, boolean excludeChildrenArea) {
         Shape shape = annotation.getROI().getShape();
         Area area = new Area(shape);
