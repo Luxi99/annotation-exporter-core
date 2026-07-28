@@ -9,6 +9,7 @@ import java.awt.geom.Area;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -94,13 +95,15 @@ public class ExpCore {
 
         return switch (mode) {
             case NONE -> p -> true;
-            case EXCLUDE -> p -> !lowered.contains(getClassName(p));
-            case INCLUDE -> p -> lowered.contains(getClassName(p));
+            case EXCLUDE -> p -> !lowered.contains(
+                    Objects.requireNonNullElse(p.getClassification(), "")
+                            .toLowerCase()
+            );
+            case INCLUDE -> p -> lowered.contains(
+                    Objects.requireNonNullElse(p.getClassification(), "")
+                            .toLowerCase()
+            );
         };
 
-    }
-
-    private static @NotNull String getClassName(PathObject p) {
-        return p.getPathClass() != null ? p.getPathClass().getName().toLowerCase() : "";
     }
 }
