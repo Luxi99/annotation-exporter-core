@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Utility class for exporting annotations from QuPath
@@ -70,7 +71,15 @@ public class ExpCore {
         return annotations.stream().filter(filter).toList();
     }
 
-    public static @NotNull Predicate<PathObject> getClassnamesPredicate(@NotNull FilterMode mode, @NotNull List<String> classnames) {
-        return a -> true;
+    public static @NotNull Predicate<PathObject> getClassnamesPredicate(@NotNull FilterMode mode, @NotNull List<String> classNames) {
+        List<String> safeClassnames = new ArrayList<>(classNames);
+        List<String> lowered = safeClassnames.stream().map(String::toLowerCase).toList();
+
+        return switch (mode) {
+            case NONE -> p -> true;
+            case EXCLUDE -> p -> !lowered.contains(p.getPathClass() != null ? p.getPathClass().getName().toLowerCase() : "");
+            case INCLUDE -> p -> lowered.contains(p.getPathClass() != null ? p.getPathClass().getName().toLowerCase() : "");
+        };
+
     }
 }
