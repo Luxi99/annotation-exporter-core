@@ -92,7 +92,7 @@ public class BuildLabelMaskTest {
         child.addChildObject(grandchild);
         parent.addChildObject(child);
 
-        var result = AnnotationExporter.buildLabelMask(
+        AnnotationExporter.LabelResult result = AnnotationExporter.buildLabelMask(
                 List.of(grandchild, parent, child), W, H, true
         );
 
@@ -110,7 +110,7 @@ public class BuildLabelMaskTest {
         child.addChildObject(grandchild);
         parent.addChildObject(child);
 
-        var result = AnnotationExporter.buildLabelMask(
+        AnnotationExporter.LabelResult result = AnnotationExporter.buildLabelMask(
                 List.of(grandchild, parent, child), W, H, true
         );
 
@@ -122,11 +122,31 @@ public class BuildLabelMaskTest {
 
     @Test
     void testUnclassifiedAnnotation() {
-        var noClass = rectangle(0, 0, 20, 20, null);
+        PathObject noClass = rectangle(0, 0, 20, 20, null);
 
-        var result = AnnotationExporter.buildLabelMask(List.of(noClass), W, H, true);
+        AnnotationExporter.LabelResult result = AnnotationExporter.buildLabelMask(List.of(noClass), W, H, true);
 
         assertThat(result.tableRows()).hasSize(1);
         assertThat(result.tableRows().getFirst()).endsWith("Unclassified");
+    }
+
+    @Test
+    void testMoreThanOneChildMultipleHoles() {
+        PathObject child1 = rectangle(15, 15, 8, 8, "nucleo1");
+        PathObject child2 = rectangle(40, 40, 8, 8, "nucleo2");
+        PathObject parent = rectangle(10, 10, 60, 60, "cellula");
+        parent.addChildObject(child1);
+        parent.addChildObject(child2);
+
+        AnnotationExporter.LabelResult result = AnnotationExporter.buildLabelMask(
+                List.of(parent, child1, child2), W, H, true
+        );
+        WritableRaster raster = result.image().getRaster();
+
+        assertThat(result.tableRows()).hasSize(3);
+        assertThat(raster.getSample(19, 19, 0)).isNotEqualTo(1);
+        assertThat(raster.getSample(44, 44, 0)).isNotEqualTo(1);
+        assertThat(raster.getSample(12, 12, 0)).isEqualTo(1);
+        assertThat(raster.getSample(19, 19, 0)).isNotEqualTo(raster.getSample(44, 44, 0));
     }
 }

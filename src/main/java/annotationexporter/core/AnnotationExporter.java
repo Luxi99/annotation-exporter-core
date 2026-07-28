@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import qupath.lib.objects.PathObject;
+import qupath.lib.objects.hierarchy.PathObjectHierarchy;
 import qupath.lib.roi.interfaces.ROI;
 
 import java.awt.*;
@@ -119,14 +120,17 @@ public class AnnotationExporter {
      * The label mask image is a 16-bit grayscale image
      * with each pixel value (or label) representing a different annotation.
      * The TSV formatted rows are the annotations' data in a tab-separated format:
-     * Label Centroid_X Centroid_Y ClassName
+     * Label, Centroid_X, Centroid_Y, ClassName
+     *
+     * @apiNote This method works only for already defined hierarchies, if no parent-child relationship is
+     * set, there is no guarantee that inner objects will be visible in the final mask. See {@link PathObjectHierarchy#resolveHierarchy()}
      *
      * @param annotations the {@code List<PathObject>} annotations to build the label mask from.
      *                    Must be already sorted or filtered if necessary.
      * @param IMG_W the width of the starting image in pixels.
      * @param IMG_H the height of the starting image in pixels
      * @param differentiateChildren if {@code true} the children of each annotation will be treated as a separate label,
-     *                              otherwise they will be ignored
+     *                              otherwise they will be ignored.
      * @return the {@code LabelResult} containing the label mask image and the TSV formatted rows.
      */
     public static @NotNull LabelResult buildLabelMask(@NotNull List<PathObject> annotations, int IMG_W, int IMG_H, boolean differentiateChildren) {
