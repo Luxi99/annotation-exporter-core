@@ -14,4 +14,4 @@ https://jitpack.io/#Luxi99/annotation-exporter-core
 
 ## License
 
-This project is licensed under the Apache 2.0 License. See the `LICENSE` file for details.
+This project is licensed under the Apache License 2.0. See the `LICENSE` file for details.
