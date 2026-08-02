@@ -28,6 +28,12 @@ jobs:
       - name: Run tests
         run: ./gradlew clean test
 
+      - name: Read version
+        id: version
+        run: |
+          VERSION=$(./gradlew -q printVersion)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
       - name: Building library
         run: ./gradlew build
 
@@ -35,10 +41,9 @@ jobs:
         id: find_jar
         shell: bash
         run: |
-          JAR_PATH=$(find build/libs -name "*.jar" -o -name "*-shadow.jar" | head -n 1)
-          if [ -z "$JAR_PATH" ]; then
-            JAR_PATH=$(find build/libs -name "*.jar" | sort -V | tail -n 1)
-          fi
+          JAR_PATH=$(find build/libs -name "annotation-exporter-core-*.jar" \
+            ! -name "*-sources.jar" \
+            ! -name "*-javadoc.jar")
           echo "jar_path=$JAR_PATH" >> "$GITHUB_OUTPUT"
           echo "Trovato jar: $JAR_PATH"
 
@@ -46,8 +51,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "v" \
+          gh release create "v$VERSION" \
               --draft \
-              --title "" \
+              --title "v$VERSION" \
               --notes "" \
               "${{ steps.find_jar.outputs.jar_path }}"

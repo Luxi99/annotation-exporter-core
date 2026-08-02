@@ -44,6 +44,13 @@ tasks.javadoc {
     }
 }
 
+tasks.register("printVersion") {
+    description = "Prints the version of this project"
+    doLast {
+        println(project.version)
+    }
+}
+
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
