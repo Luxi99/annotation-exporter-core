@@ -1,0 +1,53 @@
+name: Make draft release
+
+on:
+  workflow_dispatch:
+
+concurrency: release-${{ github.ref }}
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build shadowJar e crea la draft release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+
+      - name: gradlew execution permissions
+        run: chmod +x ./gradlew
+
+      - name: Run tests
+        run: ./gradlew clean test
+
+      - name: Building library
+        run: ./gradlew build
+
+      - name: Find jar
+        id: find_jar
+        shell: bash
+        run: |
+          JAR_PATH=$(find build/libs -name "*.jar" -o -name "*-shadow.jar" | head -n 1)
+          if [ -z "$JAR_PATH" ]; then
+            JAR_PATH=$(find build/libs -name "*.jar" | sort -V | tail -n 1)
+          fi
+          echo "jar_path=$JAR_PATH" >> "$GITHUB_OUTPUT"
+          echo "Trovato jar: $JAR_PATH"
+
+      - name: Crea la draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "" \
+              --draft \
+              --title "" \
+              --notes "" \
+              "${{ steps.find_jar.outputs.jar_path }}"
