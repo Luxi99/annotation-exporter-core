@@ -39,14 +39,14 @@ import annotationexporter.core.AnnotationExporter.LabelResult
 This script exports all annotations in the current image in a similar manner
 as the [QuPath Annotation Exporter Extension](https://github.com/Luxi99/qupath-extension-annotation-exporter).
 It can be run directly from the QuPath GUI using `Automate` > `Scripts` > `Run for project`,
-via the command line or via the special *Python* [script](run_export.py) (suggested method).
-The script can also be run from the command line using the following command:
+via the command line or via the special *Python* [script](run_export.py) in this folder
+(suggested method). This is done by using the following command:
 
 ```shell
 python run_export.py
 ```
 
-For documentation or usage examples run
+For documentation or usage examples, run:
 
 ```shell
 python run_export.py --help
