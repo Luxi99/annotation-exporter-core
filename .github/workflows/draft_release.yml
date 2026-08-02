@@ -51,8 +51,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "v$VERSION" \
+          gh release create "v${{ steps.version.outputs.version }}" \
               --draft \
-              --title "v$VERSION" \
+              --title "v${{ steps.version.outputs.version }}" \
               --notes "" \
               "${{ steps.find_jar.outputs.jar_path }}"
